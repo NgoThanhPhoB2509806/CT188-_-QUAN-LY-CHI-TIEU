@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Website quản lý thu chi cá nhân, ngân sách và mục tiêu tiết kiệm.">
+  <title>FinMate - Quản lý chi tiêu</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="brand-mark">F</span><span>FinMate</span></div>
+      <p class="nav-label">MENU CHÍNH</p>
+      <nav class="nav-list" aria-label="Điều hướng chính">
+        <button class="nav-item active" data-page="dashboard"><span>▦</span>Tổng quan</button>
+        <button class="nav-item" data-page="transactions"><span>⇄</span>Giao dịch</button>
+        <button class="nav-item" data-page="budgets"><span>◉</span>Ngân sách</button>
+        <button class="nav-item" data-page="reports"><span>▥</span>Báo cáo</button>
+        <button class="nav-item" data-page="goals"><span>◎</span>Mục tiêu tiết kiệm</button>
+        <button class="nav-item" data-page="assistant"><span>✧</span>Trợ lý tài chính</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="tip-box">
+          <div class="tip-icon">✦</div>
+          <strong>Mẹo tài chính</strong>
+          <p>Ghi lại chi tiêu hằng ngày để hiểu rõ tiền của bạn đang đi đâu.</p>
+        </div>
+        <div class="profile"><div class="avatar">B</div><div><strong>Người dùng</strong><small>Tài khoản cá nhân</small></div></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
+        <div><p class="eyebrow">QUẢN LÝ TÀI CHÍNH CÁ NHÂN</p><h1 id="pageTitle">Tổng quan</h1></div>
+        <div class="top-actions">
+          <label class="month-select">Tháng
+            <input type="month" id="globalMonth">
+          </label>
+          <button class="primary-btn" id="quickAdd">＋ Thêm giao dịch</button>
+        </div>
+      </header>
+
+      <section class="page active" id="page-dashboard">
+        <div class="welcome-row"><div><h2>Chào bạn! 👋</h2><p class="muted">Cùng xem tình hình tài chính của bạn trong tháng này.</p></div><span class="date-pill" id="todayLabel"></span></div>
+        <div class="stats-grid">
+          <article class="stat-card balance-card"><div class="stat-top"><span>Tổng số dư</span><span class="stat-icon">◈</span></div><div class="stat-value" id="balanceValue">0 ₫</div><p class="stat-foot">Tổng thu nhập trừ tổng chi tiêu đã ghi nhận</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Thu nhập tháng</span><span class="stat-icon green">↙</span></div><div class="stat-value" id="incomeValue">0 ₫</div><p class="stat-foot">Các khoản tiền vào trong tháng</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Chi tiêu tháng</span><span class="stat-icon red">↗</span></div><div class="stat-value" id="expenseValue">0 ₫</div><p class="stat-foot">Các khoản tiền ra trong tháng</p></article>
+          <article class="stat-card"><div class="stat-top"><span>Ngân sách còn lại</span><span class="stat-icon purple">◷</span></div><div class="stat-value" id="remainingValue">0 ₫</div><p class="stat-foot">Ngân sách tháng trừ chi tiêu</p></article>
+        </div>
+        <div class="dashboard-grid">
+          <article class="panel chart-panel"><div class="panel-heading"><div><h3>Thu nhập và chi tiêu</h3><p class="muted">Diễn biến theo ngày trong tháng</p></div><span class="mini-tag">Theo ngày</span></div><div class="chart-wrap"><canvas id="dailyChart"></canvas></div></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Cơ cấu chi tiêu</h3><p class="muted">Theo danh mục</p></div></div><div class="chart-wrap doughnut-wrap"><canvas id="categoryChart"></canvas></div><div id="categoryLegend" class="category-legend"></div></article>
+        </div>
+        <article class="panel recent-panel"><div class="panel-heading"><div><h3>Giao dịch gần đây</h3><p class="muted">Những khoản thu chi mới nhất</p></div><button class="text-btn" data-goto="transactions">Xem tất cả →</button></div><div id="recentTransactions"></div></article>
+      </section>
+
+      <section class="page" id="page-transactions">
+        <div class="section-heading"><div><h2>Quản lý giao dịch</h2><p class="muted">Theo dõi mọi khoản thu nhập và chi tiêu.</p></div><button class="primary-btn" id="addTransactionBtn">＋ Thêm giao dịch</button></div>
+        <div class="filter-row panel">
+          <input id="searchTransaction" type="search" placeholder="Tìm theo nội dung...">
+          <select id="typeFilter"><option value="all">Tất cả giao dịch</option><option value="income">Thu nhập</option><option value="expense">Chi tiêu</option></select>
+          <select id="categoryFilter"><option value="all">Tất cả danh mục</option></select>
+          <input id="transactionMonth" type="month" aria-label="Lọc theo tháng">
+        </div>
+        <article class="panel"><div id="allTransactions"></div></article>
+      </section>
+
+      <section class="page" id="page-budgets">
+        <div class="section-heading"><div><h2>Ngân sách</h2><p class="muted">Đặt giới hạn để chủ động kiểm soát chi tiêu.</p></div><button class="primary-btn" id="setBudgetBtn">＋ Đặt ngân sách</button></div>
+        <div class="budget-summary stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Tổng ngân sách tháng</span><span class="stat-icon purple">◉</span></div><div class="stat-value" id="budgetTotal">0 ₫</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Đã chi</span><span class="stat-icon red">↗</span></div><div class="stat-value" id="budgetSpent">0 ₫</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Còn lại</span><span class="stat-icon green">✓</span></div><div class="stat-value" id="budgetLeft">0 ₫</div></article>
+        </div>
+        <div id="budgetList" class="budget-grid"></div>
+      </section>
+
+      <section class="page" id="page-reports">
+        <div class="section-heading"><div><h2>Báo cáo thống kê</h2><p class="muted">Phân tích thu chi để đưa ra quyết định tốt hơn.</p></div><button class="secondary-btn" id="exportCsv">⇩ Xuất CSV</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Tổng thu trong tháng</span><span class="stat-icon green">↙</span></div><div class="stat-value" id="reportIncome">0 ₫</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Tổng chi trong tháng</span><span class="stat-icon red">↗</span></div><div class="stat-value" id="reportExpense">0 ₫</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Tỷ lệ chi/thu</span><span class="stat-icon purple">%</span></div><div class="stat-value" id="expenseRatio">0%</div></article>
+        </div>
+        <div class="dashboard-grid"><article class="panel"><div class="panel-heading"><div><h3>So sánh thu và chi</h3><p class="muted">Sáu tháng gần nhất</p></div></div><div class="chart-wrap"><canvas id="monthlyChart"></canvas></div></article><article class="panel"><div class="panel-heading"><div><h3>Nhận xét nhanh</h3><p class="muted">Tự động từ dữ liệu hiện có</p></div></div><div id="reportInsights" class="insight-list"></div></article></div>
+      </section>
+
+      <section class="page" id="page-goals">
+        <div class="section-heading"><div><h2>Mục tiêu tiết kiệm</h2><p class="muted">Chia mục tiêu lớn thành những bước nhỏ.</p></div><button class="primary-btn" id="addGoalBtn">＋ Tạo mục tiêu</button></div>
+        <div id="goalsList" class="goal-grid"></div>
+      </section>
+
+      <section class="page" id="page-assistant">
+        <div class="section-heading"><div><h2>Trợ lý tài chính thông minh</h2><p class="muted">Phân tích dữ liệu giao dịch và gợi ý cải thiện thói quen chi tiêu.</p></div><span class="ai-badge">✧ Phân tích tự động</span></div>
+        <div class="assistant-hero"><div class="assistant-orb">✧</div><div><h3>Hiểu rõ hơn về thói quen chi tiêu</h3><p>Trợ lý sử dụng quy tắc phân tích trên dữ liệu lưu trong trình duyệt. Kết quả chỉ mang tính tham khảo, không phải tư vấn tài chính chuyên nghiệp.</p><button class="primary-btn" id="runAnalysis">Phân tích dữ liệu của tôi</button></div></div>
+        <div id="aiResults" class="ai-results"><article class="panel empty-state">Nhấn “Phân tích dữ liệu của tôi” để nhận báo cáo cá nhân hóa.</article></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="transactionModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="transactionModalTitle">
+      <div class="modal-header"><div><p class="eyebrow">GHI CHÉP TÀI CHÍNH</p><h2 id="transactionModalTitle">Thêm giao dịch</h2></div><button class="icon-btn" data-close="transactionModal" aria-label="Đóng">×</button></div>
+      <form id="transactionForm">
+        <input type="hidden" id="editId">
+        <div class="form-group"><label>Loại giao dịch</label><div class="segmented"><label><input type="radio" name="type" value="expense" checked><span>Chi tiêu</span></label><label><input type="radio" name="type" value="income"><span>Thu nhập</span></label></div></div>
+        <div class="form-grid"><div class="form-group"><label for="amount">Số tiền (VNĐ) *</label><input id="amount" type="number" min="1" step="1000" required placeholder="Ví dụ: 50000"></div><div class="form-group"><label for="date">Ngày giao dịch *</label><input id="date" type="date" required></div></div>
+        <div class="form-grid"><div class="form-group"><label for="category">Danh mục *</label><select id="category" required></select></div><div class="form-group"><label for="paymentMethod">Phương thức</label><select id="paymentMethod"><option>Tiền mặt</option><option>Chuyển khoản</option><option>Thẻ ngân hàng</option><option>Ví điện tử</option></select></div></div>
+        <div class="form-group"><label for="note">Nội dung / ghi chú *</label><input id="note" required maxlength="120" placeholder="Ví dụ: Ăn trưa, tiền làm thêm..."></div>
+        <div class="modal-actions"><button type="button" class="secondary-btn" data-close="transactionModal">Hủy</button><button type="submit" class="primary-btn">Lưu giao dịch</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="budgetModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="budgetModalTitle">
+      <div class="modal-header"><div><p class="eyebrow">KẾ HOẠCH CHI TIÊU</p><h2 id="budgetModalTitle">Đặt ngân sách</h2></div><button class="icon-btn" data-close="budgetModal" aria-label="Đóng">×</button></div>
+      <form id="budgetForm"><div class="form-group"><label for="budgetCategory">Danh mục</label><select id="budgetCategory"></select></div><div class="form-group"><label for="budgetAmount">Hạn mức tháng (VNĐ)</label><input id="budgetAmount" type="number" min="1" required placeholder="Ví dụ: 2000000"></div><div class="modal-actions"><button type="button" class="secondary-btn" data-close="budgetModal">Hủy</button><button class="primary-btn" type="submit">Lưu ngân sách</button></div></form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="goalModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle">
+      <div class="modal-header"><div><p class="eyebrow">KẾ HOẠCH TƯƠNG LAI</p><h2 id="goalModalTitle">Tạo mục tiêu tiết kiệm</h2></div><button class="icon-btn" data-close="goalModal" aria-label="Đóng">×</button></div>
+      <form id="goalForm"><div class="form-group"><label for="goalName">Tên mục tiêu</label><input id="goalName" required maxlength="80" placeholder="Ví dụ: Mua laptop"></div><div class="form-grid"><div class="form-group"><label for="goalTarget">Số tiền mục tiêu</label><input id="goalTarget" type="number" min="1" required></div><div class="form-group"><label for="goalSaved">Đã tiết kiệm</label><input id="goalSaved" type="number" min="0" value="0" required></div></div><div class="form-group"><label for="goalDeadline">Ngày dự kiến hoàn thành</label><input id="goalDeadline" type="date"></div><div class="modal-actions"><button type="button" class="secondary-btn" data-close="goalModal">Hủy</button><button class="primary-btn" type="submit">Lưu mục tiêu</button></div></form>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
